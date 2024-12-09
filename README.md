@@ -1,5 +1,6 @@
 # CS211GameOfLife
-Code repository for CS211 Final Project.
+Code repository for CS211 Final Project (Topic 1).
+Created by Christopher Lam (cl1515)
 
 ## Table Of Contents
 - [Demonstration](#demo)
