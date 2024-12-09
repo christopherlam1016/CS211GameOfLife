@@ -1,0 +1,54 @@
+{
+    "0": [
+        {
+            "turn_to": 0
+        }
+    ],
+    "1": [
+        {
+            "neighbor_to": {
+                "if": [
+                    {
+                        "at_least": 1,
+                        "at_most": 9,
+                        "type": 2
+                    }
+                ],
+                "then": {
+                    "probability": [
+                        {
+                            "value": 0.25,
+                            "then": {
+                                "turn_to": 2
+                            }
+                        },
+                        {
+                            "value": 0.75,
+                            "then": {
+                                "turn_to": 1
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "2": [
+        {
+            "probability": [
+                {
+                    "value": 0.5,
+                    "then": {
+                        "turn_to": 0
+                    }
+                },
+                {
+                    "value": 0.5,
+                    "then": {
+                        "turn_to": 2
+                    }
+                }
+            ]
+        }
+    ]
+}

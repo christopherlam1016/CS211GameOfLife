@@ -68,10 +68,10 @@ class GameOfLifeGUI:
 
         self.file_label = tk.Label(self.root, text="Optional: Select a JSON file for custom ruleset")
         self.file_label.pack()
-        self.file_button = tk.Button(self.root, text="Browse", command=self.browse_file)
+        self.file_button = tk.Button(self.root, text="Browse", command=self.browse_json)
         self.file_button.pack()
-        self.file_path = tk.StringVar()
-        self.file_entry = tk.Entry(self.root, textvariable=self.file_path, state='readonly')
+        self.json_path = tk.StringVar()
+        self.file_entry = tk.Entry(self.root, textvariable=self.json_path, state='readonly')
         self.file_entry.pack()
 
         self.csv_label = tk.Label(self.root, text="Optional: Select a CSV file for custom grid")
@@ -90,10 +90,15 @@ class GameOfLifeGUI:
 
         self.running = False
 
-    def browse_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")], initialdir=".")
-        if file_path:
-            self.file_path.set(file_path)
+    def browse_json(self):
+        json_path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")], initialdir=".")
+        if json_path:
+            self.json_path.set(json_path)
+
+    def load_json_rules(self, json_path):
+        with open(json_path, 'r') as file:
+            ### TODO: Implement custom ruleset
+            pass
 
     def browse_csv(self):
         csv_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")], initialdir=".")
@@ -116,6 +121,8 @@ class GameOfLifeGUI:
         if self.csv_path.get():
             self.life_state = self.custom_grid
             rows, columns = self.life_state.shape
+        elif self.json_path.get():
+            pass #### TODO: Implement custom ruleset
         else:
             rows = int(self.rows_entry.get()) if self.rows_entry.get() != "(default is 8)" else 8
             columns = int(self.columns_entry.get()) if self.columns_entry.get() != "(default is 8)" else 8
@@ -125,7 +132,7 @@ class GameOfLifeGUI:
             self.life_state = init_life_state_1(rows, columns, probability)
 
         iterations = int(self.iteration_entry.get()) if self.iteration_entry.get() != "(default is 10)" else 10
-        file_path = self.file_path.get()
+        json_path = self.json_path.get()
 
         for widget in self.root.winfo_children():
             widget.destroy()
@@ -147,7 +154,7 @@ class GameOfLifeGUI:
         fig, ax = plt.subplots()
         ax.axis('on')
         ax.set_title("Game of Life on a {0}x{1} Grid".format(rows, columns))
-        self.im = ax.imshow(self.life_state, cmap='binary')
+        self.im = ax.imshow(self.life_state, cmap='summer')
 
         ax.set_xticks(np.arange(-0.5, columns, 1), minor=True)
         ax.set_yticks(np.arange(-0.5, rows, 1), minor=True)
@@ -190,7 +197,7 @@ class GameOfLifeGUI:
                 break
             self.next_iteration()
             self.root.update()
-            self.root.after(500)
+            self.root.after(100)
 
     def stop_simulation(self):
         self.running = False
@@ -232,7 +239,7 @@ def update_life_state_1(life_state, out_life_state=None):
             alive_neighbors = neighborhood_sum - life_state[i, j]
 
             if life_state[i, j] == 1:
-                if alive_neighbors < 2  or alive_neighbors > 3:
+                if alive_neighbors != 2 and alive_neighbors != 3:
                     out_life_state[i, j] = 0
                 else:
                     out_life_state[i, j] = 1
@@ -241,6 +248,11 @@ def update_life_state_1(life_state, out_life_state=None):
                     out_life_state[i, j] = 1
                 else:
                     out_life_state[i, j] = 0
+
+    return out_life_state
+
+def update_life_state_2(life_state, b1=3, b2=3, d1=2, d2=3, out_life_state=None):
+
 
     return out_life_state
 
