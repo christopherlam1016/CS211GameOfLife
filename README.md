@@ -2,8 +2,8 @@
 Code repository for CS211 Final Project.
 
 ## Table Of Contents
-- [Installation] (#installation)
-- [Usage] (#usage)
+- [Installation](#installation)
+- [Usage](#usage)
 
 ## Installation
 
