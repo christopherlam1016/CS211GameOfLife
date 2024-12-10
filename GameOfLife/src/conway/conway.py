@@ -6,6 +6,15 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.animation as animation
 import csv
 
+"""
+A simple implementation of Conway's Game of Life using numpy for the game logic and Tkinter for the GUI.
+Author: Christopher Lam (cl1515)
+Date: 12/9/2024
+
+To run the program, simply run the following command in the terminal:
+python conway.py
+"""
+
 class GameOfLifeGUI:
     def __init__(self, root):
         self.root = root
@@ -24,6 +33,7 @@ class GameOfLifeGUI:
 
         self.create_initial_widgets()
 
+    # Create the initial widgets for the GUI
     def create_initial_widgets(self):
         self.quit_button_frame = tk.Frame(self.root)
         self.quit_button_frame.pack(side=tk.TOP, anchor=tk.NE)
@@ -155,6 +165,8 @@ class GameOfLifeGUI:
         ax.axis('on')
         ax.set_title("Game of Life on a {0}x{1} Grid".format(rows, columns))
         self.im = ax.imshow(self.life_state, cmap='summer')
+        self.im.colorbar = ax.figure.colorbar(self.im, ax=ax, ticks=[0, 1], orientation='horizontal')
+        self.im.colorbar.ax.set_xticklabels(['Dead', 'Alive'])
 
         ax.set_xticks(np.arange(-0.5, columns, 1), minor=True)
         ax.set_yticks(np.arange(-0.5, rows, 1), minor=True)
@@ -168,10 +180,12 @@ class GameOfLifeGUI:
         button_frame = tk.Frame(self.root)
         button_frame.pack()
 
+        # Create a frame for the legend
+
         self.next_button = tk.Button(button_frame, text="Next Iteration", command=self.next_iteration)
         self.next_button.grid(row=0, column=0)
 
-        self.run_button = tk.Button(button_frame, text="Run {self.iterations} Iterations", command=self.run_all_iterations)
+        self.run_button = tk.Button(button_frame, text=f"Run {self.iterations} Iterations", command=self.run_all_iterations)
         self.run_button.grid(row=1, column=0)
 
         self.stop_button = tk.Button(button_frame, text="Stop", command=self.stop_simulation)
@@ -252,8 +266,40 @@ def update_life_state_1(life_state, out_life_state=None):
     return out_life_state
 
 def update_life_state_2(life_state, b1=3, b2=3, d1=2, d2=3, out_life_state=None):
+    """
+    For each cell evaluate the update rules specified above to obtain its new state
+    IN: life_state, ndarray of shape (n, m), initial state of the cells
+        b1, int, lower bound of the number of neighbors for a dead cell to come back to life
+        b2, int, upper bound of the number of neighbors for a dead cell to come back to life
+        d1, int, lower bound of the number of neighbors for an alive cell to continue to be alive
+        d2, int, upper bound of the number of neighbors for an alive cell to continue to be alive
+        out_life_state, ndarray of shape (n, m), for storing the next state of the cells, if None, create a new array
+    OUT: ndarray of shape (n, m), next state of the cells
+    """
+    n, m = life_state.shape
+    if out_life_state is None:
+        out_life_state = np.zeros((n, m), dtype=bool)
 
+    for i in range(n):
+        for j in range(m):
+            row_start = max(i - 1, 0)
+            row_end = min(i + 2, n)
+            col_start = max(j - 1, 0)
+            col_end = min(j + 2, m)
+            neighborhood_sum = np.sum(life_state[row_start:row_end, col_start:col_end])
+            alive_neighbors = neighborhood_sum - life_state[i, j]
 
+            if life_state[i, j] == 1: # if the cell is alive
+                if alive_neighbors < d1 or alive_neighbors > d2: # if the cell has less than d1 or more than d2 neighbors (exclusive)
+                    out_life_state[i, j] = 0 # kill the cell
+                else:
+                    out_life_state[i, j] = 1 # keep the cell alive
+            else: # if the cell is dead
+                if alive_neighbors >= b1 and alive_neighbors <= b2: # if the cell has between b1 and b2 neighbors (inclusive)
+                    out_life_state[i, j] = 1 # revive the cell
+                else:
+                    out_life_state[i, j] = 0 # keep the cell dead
+    
     return out_life_state
 
 if __name__ == "__main__":
